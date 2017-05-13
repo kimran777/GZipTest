@@ -40,9 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GZipMTStream.cs" />
+    <Compile Include="GZip\DataBlock.cs" />
+    <Compile Include="Helpers\FileHelper.cs" />
+    <Compile Include="GZip\Comressor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GZip\GZipCompressor.cs" />
+    <Compile Include="Threading\DictionaryWithLock.cs" />
+    <Compile Include="Threading\ThreadManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GZipLib\GZipLib.csproj">
