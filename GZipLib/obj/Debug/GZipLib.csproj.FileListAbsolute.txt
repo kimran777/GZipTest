@@ -1,0 +1,5 @@
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipLib\bin\Debug\GZipLib.dll
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipLib\bin\Debug\GZipLib.pdb
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipLib\obj\Debug\GZipLib.csprojResolveAssemblyReference.cache
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipLib\obj\Debug\GZipLib.dll
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipLib\obj\Debug\GZipLib.pdb
