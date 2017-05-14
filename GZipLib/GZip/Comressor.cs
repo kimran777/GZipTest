@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GZipLib.GZip
 {
-    abstract public class Compressor
+    public abstract class Compressor
     {
 
         public Compressor(FileInfo inFileInfo, FileInfo outFileInfo)
@@ -22,7 +22,7 @@ namespace GZipLib.GZip
 
             InFileInfo = inFileInfo;
             OutFileInfo = outFileInfo;
-            
+
         }
 
         protected FileInfo InFileInfo

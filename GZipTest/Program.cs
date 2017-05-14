@@ -1,12 +1,9 @@
-﻿using GZipLib;
-using GZipLib.GZip;
+﻿using GZipLib.GZip;
+using GZipLib.GZip.Exceptions;
 using GZipTest.File;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
 
 namespace GZipTest
 {
@@ -16,34 +13,50 @@ namespace GZipTest
         {
             try
             {
-                FileInfo inputInfo = new FileInfo(@"D:\1024000.txt");
-                FileInfo outInfo = new FileInfo(@"D:\1024000.txt.gz");
+                //FileInfo inputInfo = new FileInfo(@"D:\1024000.txt");
+                //FileInfo outInfo = new FileInfo(@"D:\1024000.txt.gz");
 
-                FileHelper.CheckOutputExist(outInfo);
+                //FileHelper.CheckOutputExist(outInfo);
 
-                var compressor = GZipCompressFactory.Get(CompressionMode.Compress, inputInfo, outInfo);
-                compressor.Start();
+                //var compressor = GZipCompressFactory.Get(CompressionMode.Compress, inputInfo, outInfo);
+                //compressor.Start();
 
                 FileInfo inputInfo2 = new FileInfo(@"D:\1024000.txt.gz");
                 FileInfo outInfo2 = new FileInfo(@"D:\1024000_test.txt");
 
-                FileHelper.CheckOutputExist(outInfo);
+                FileHelper.CheckOutputExist(outInfo2);
 
                 var compressor2 = GZipCompressFactory.Get(CompressionMode.Decompress, inputInfo2, outInfo2);
                 compressor2.Start();
-
-
+                
 
             }
             catch (InvalidDataException e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("Архив повреждён");
             }
             catch (OperationCanceledException e)
             {
                 Console.WriteLine(e.Message);
+            
+            }
+            catch(FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (OutOfMemoryException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (FileExtensionException e)
+            {
+                Console.WriteLine(e.Message);
             }
 
+
+#if DEBUG
+            Console.ReadKey();
+#endif
         }
 
     }

@@ -1,9 +1,11 @@
 ﻿using GZipLib.GZip.Exceptions;
-using GZipLib.Threading;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
+using Threading;
 
 namespace GZipLib.GZip
 {
@@ -13,9 +15,9 @@ namespace GZipLib.GZip
         Stream _inFileStream;
         Stream _outFileStream;
         DictionaryWithLock<DataBlock> _compressedBlocksProd;
+        Queue<Exception> _errors = new Queue<Exception>();
         private readonly object _lockPoint = new object();
-
-
+        
         public GZipCompressor(FileInfo inFileInfo, FileInfo outFileInfo) : base(inFileInfo, outFileInfo)
         {
             _numOfBlocks = CalcNumOfBlocks(InFileInfo.Length);
@@ -27,21 +29,30 @@ namespace GZipLib.GZip
             PrepareInFileStream();
             PrepareOutFileStream();
 
-            var writeThread = new Thread(WriteBlocks);
+            var writeThread = ThreadManager.GetSafeThread(WriteBlocks, ExceptionHandler);
             writeThread.Start();
 
-            var compressThreads = ThreadManager.GetThreads(Environment.ProcessorCount, CompressBlocks);
+            var compressThreads = 
+                ThreadManager.GetSafeThreads(Environment.ProcessorCount, CompressBlocks, ExceptionHandler);
+            
+
             compressThreads.StartThreads();
 
-            compressThreads.WaitThreads().ContinueWith(() =>
+            compressThreads.WaitThreads().ContinueWithOneTime(() =>
             {
                 _compressedBlocksProd.Stop();
             });
 
             writeThread.Join();
 
-            _inFileStream.Close();
+            _inFileStream.Close();            
             _outFileStream.Close();
+
+            if (_errors.Any())
+            {
+                OutFileInfo.Delete();
+                throw _errors.Dequeue();
+            }
         }
 
         int blockIter = 0;
@@ -64,12 +75,15 @@ namespace GZipLib.GZip
                     blockIter++;
                 }
 
+
                 using (var mem = new MemoryStream())
                 {
                     using (var gzStream = new GZipStreamEx(mem, CompressionMode.Compress, originalFileName, true))
                     {
                         gzStream.Write(buffer, 0, readedData);
                     }
+
+
                     _compressedBlocksProd.Add(blockId, new DataBlock(mem.ToArray(), (int)mem.Length, blockId));
                 }
 
@@ -78,6 +92,7 @@ namespace GZipLib.GZip
 
 
         }
+
 
 
         private void WriteBlocks()
@@ -136,6 +151,17 @@ namespace GZipLib.GZip
                 return length / _blockSize + 1;
             }
         }
+
+        private void ExceptionHandler(Exception exception)
+        {
+            _compressedBlocksProd.Abort();
+            lock (_errors)
+            {
+                _errors.Enqueue(exception);
+            }
+            Thread.CurrentThread.Abort();
+        }
+        
 
     }
 

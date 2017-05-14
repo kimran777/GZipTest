@@ -1,11 +1,11 @@
-﻿using GZipLib;
-using GZipLib.GZip.Exceptions;
-using GZipLib.Threading;
+﻿using GZipLib.GZip.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
+using Threading;
 
 namespace GZipLib.GZip
 {
@@ -15,6 +15,7 @@ namespace GZipLib.GZip
         Stream _outFileStream;
         private readonly object _lockPoint = new object();
         DictionaryWithLock<DataBlock> _decompressedBlocksProd;
+        Queue<Exception> _errors = new Queue<Exception>();
 
 
         public GZipDecompressor(FileInfo inFileInfo, FileInfo outFileInfo) : base(inFileInfo, outFileInfo)
@@ -24,25 +25,33 @@ namespace GZipLib.GZip
 
         public override void Start()
         {
+
             PrepareInFileStream();
             PrepareOutFileStream();
 
-            var writeThread = new Thread(WriteBlocks);
+            var writeThread = ThreadManager.GetSafeThread(WriteBlocks, ExceptionHandler);
             writeThread.Start();
 
-            var compressThreads = ThreadManager.GetThreads(Environment.ProcessorCount, DecompressBlocks);
-            compressThreads.StartThreads();
+            var decompressThreads = ThreadManager.GetSafeThreads(Environment.ProcessorCount, DecompressBlocks, ExceptionHandler);
+            decompressThreads.StartThreads();
 
-            compressThreads.WaitThreads().ContinueWith(() =>
+
+            decompressThreads.WaitThreads().ContinueWithOneTime(() =>
             {
                 _decompressedBlocksProd.Stop();
             });
+            
 
             writeThread.Join();
 
             _inFileStream.Close();
             _outFileStream.Close();
 
+            if (_errors.Any())
+            {
+                OutFileInfo.Delete();
+                throw _errors.Dequeue();
+            }
         }
 
 
@@ -65,9 +74,10 @@ namespace GZipLib.GZip
 
                     int blockSize = 0;
 
+
                     if (GZipStreamEx.TryGetBlockSize(_inFileStream, out blockSize) == false)
                     {
-                        throw new InvalidDataException();
+                        throw new InvalidDataException("архив повреждён");
                     }
 
                     buffer = new byte[blockSize];
@@ -96,7 +106,6 @@ namespace GZipLib.GZip
                             }
                             while (decompCountBytes != 0);
                         }
-
                         _decompressedBlocksProd.Add(blockId, new DataBlock(output.ToArray(), (int)output.Length, blockId));
                     }
                 }
@@ -106,8 +115,7 @@ namespace GZipLib.GZip
 
 
         }
-
-
+        
 
         private void WriteBlocks()
         {
@@ -148,6 +156,15 @@ namespace GZipLib.GZip
 
             _outFileStream = OutFileInfo.Open(FileMode.Create, FileAccess.Write);
 
+        }
+        private void ExceptionHandler(Exception exception)
+        {
+            _decompressedBlocksProd.Abort();
+            lock (_errors)
+            {
+                _errors.Enqueue(exception);
+            }
+            Thread.CurrentThread.Abort();
         }
     }
 }

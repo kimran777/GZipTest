@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace GZipLib.Threading
+namespace Threading
 {
-    class DictionaryWithLock<T> where T : class
+    public class DictionaryWithLock<T> where T : class
     {
 
         private readonly object _lockPoint = new object();
@@ -35,15 +35,30 @@ namespace GZipLib.Threading
 
             lock (_lockPoint)
             {
+
                 if (_isStopped)
                 {
                     throw new InvalidOperationException("ProduceConsume is stopped");
+                }
+                if (_isAbort)
+                {
+                    throw new InvalidOperationException("ProduceConsume is aborted");
                 }
 
                 while (_dictionary.Count >= MaxSize)
                 {
                     Monitor.Wait(_lockPoint);
+
+                    if (_isStopped)
+                    {
+                        throw new InvalidOperationException("ProduceConsume is stopped");
+                    }
+                    if (_isAbort)
+                    {
+                        throw new InvalidOperationException("ProduceConsume is aborted");
+                    }
                 }
+
 
                 //queue.Add(task);
                 _dictionary[key] = value;

@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8D9E363D-7929-4129-9B6A-F651DECDFAF1}</ProjectGuid>
+    <ProjectGuid>{793BAA32-A176-46FA-B970-A3F4157A4EA3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GZipLib</RootNamespace>
-    <AssemblyName>GZipLib</AssemblyName>
+    <RootNamespace>Threading</RootNamespace>
+    <AssemblyName>Threading</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +28,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -39,25 +36,13 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GZip\GZipCompressFactory.cs" />
-    <Compile Include="GZip\GZipStreamEx.cs" />
-    <Compile Include="GZip\Comressor.cs" />
-    <Compile Include="GZip\DataBlock.cs" />
-    <Compile Include="GZip\Exceptions\FileExtensionException.cs" />
-    <Compile Include="GZip\GZipCompressor.cs" />
-    <Compile Include="GZip\GZipDecompressor.cs" />
-    <Compile Include="GZip\HeaderFLG.cs" />
+    <Compile Include="DictionaryWithLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <ProjectReference Include="..\Threading\Threading.csproj">
-      <Project>{793BAA32-A176-46FA-B970-A3F4157A4EA3}</Project>
-      <Name>Threading</Name>
-    </ProjectReference>
+    <Compile Include="ThreadManager.cs" />
+    <Compile Include="ThreadsExtension.cs" />
+    <Compile Include="WaitThreadResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

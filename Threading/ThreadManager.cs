@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace GZipLib.Threading
+namespace Threading
 {
-    class ThreadManager
+    public class ThreadManager
     {
         public static List<Thread> GetThreads(int numOfThread, ThreadStart start)
         {
@@ -17,6 +17,27 @@ namespace GZipLib.Threading
             }
             return result;
         }
+        public static IEnumerable<Thread> GetSafeThreads(int numOfThread, ThreadStart start, Action<Exception> handler)
+        {
+            List<Thread> result = new List<Thread>();
+            for (int i = 0; i < numOfThread; i++)
+            {
+                result.Add(new Thread(() =>
+                {
+                    SafeExecute(() => start(), handler);
+                }));
+            }
+            return result;
+        }
+
+        public static Thread GetSafeThread(ThreadStart start, Action<Exception> handler)
+        {
+            return new Thread(() =>
+            {
+                SafeExecute(() => start(), handler);
+            });
+        }
+
 
         public static List<Thread> GetThreads(int numOfThread, ParameterizedThreadStart start)
         {
@@ -50,5 +71,16 @@ namespace GZipLib.Threading
         }
 
 
+        private static void SafeExecute(ThreadStart start, Action<Exception> handler)
+        {
+            try
+            {
+                start.Invoke();
+            }
+            catch (Exception ex)
+            {
+                handler(ex);
+            }
+        }
     }
 }

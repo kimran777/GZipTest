@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace GZipLib.GZip.Exceptions
 {
-    class FileExtensionException : Exception
+    public class FileExtensionException : Exception
     {
-        public FileExtensionException()
-        { }
+        public FileExtensionException() : base("Ошибка расширения файла")
+        {
+            
+        }
 
         public FileExtensionException(string message) : base(message)
         {
