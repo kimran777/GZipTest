@@ -1,5 +1,4 @@
 ﻿using GZipLib;
-using GZipLib.File;
 using GZipLib.GZip.Exceptions;
 using GZipLib.Threading;
 using System;
@@ -10,7 +9,7 @@ using System.Threading;
 
 namespace GZipLib.GZip
 {
-    class GZipDecompressor : Compressor
+    public class GZipDecompressor : Compressor
     {
         Stream _inFileStream;
         Stream _outFileStream;
@@ -20,7 +19,7 @@ namespace GZipLib.GZip
 
         public GZipDecompressor(FileInfo inFileInfo, FileInfo outFileInfo) : base(inFileInfo, outFileInfo)
         {
-            _decompressedBlocksProd = new DictionaryWithLock<DataBlock>(200);
+            _decompressedBlocksProd = new DictionaryWithLock<DataBlock>(50);
         }
 
         public override void Start()
@@ -144,11 +143,10 @@ namespace GZipLib.GZip
         {
             if (OutFileInfo.Extension.ToLower() == ".gz")
             {
-                string fixedOutName = OutFileInfo.FullName.PadRight(OutFileInfo.Extension.Length);
-                OutFileInfo = new FileInfo(fixedOutName);
+                throw new FileExtensionException("Результирующий файл не может быть формата .gz");
             }
 
-            _outFileStream = FileHelper.CreateFileToWrite(OutFileInfo);
+            _outFileStream = OutFileInfo.Open(FileMode.Create, FileAccess.Write);
 
         }
     }

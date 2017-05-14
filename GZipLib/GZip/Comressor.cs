@@ -20,16 +20,9 @@ namespace GZipLib.GZip
                 throw new ArgumentNullException("outFileInfo");
             }
 
-
             InFileInfo = inFileInfo;
             OutFileInfo = outFileInfo;
-
-            if (!InFileInfo.Exists)
-            {
-                throw new FileNotFoundException(string.Format("Файл {0} не найден", InFileInfo.FullName));
-            }
             
-
         }
 
         protected FileInfo InFileInfo

@@ -4,22 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace GZipLib.File
+namespace GZipTest.File
 {
     class FileHelper
     {
-        public static FileStream CreateFileToWrite(FileInfo fileInfo)
+        public static void CheckOutputExist(FileInfo outputFile)
         {
-
-            if (!fileInfo.Exists)
+            if (!outputFile.Exists)
             {
-                return fileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.Write);
+                return;
             }
 
             while (true)
             {
 
-                Console.Write("Файл {0} уже существует. Заменить файл? [да/нет]: ", fileInfo);
+                Console.Write("Файл {0} уже существует. Заменить файл? [да/нет]: ", outputFile.FullName);
 
                 var answer = Console.ReadLine().ToLower();
 
@@ -29,7 +28,7 @@ namespace GZipLib.File
                     case "да":
                     case "д":
                         {
-                            return fileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.Write);
+                            return;
                         }
                     case "нет":
                     case "н":
@@ -39,7 +38,7 @@ namespace GZipLib.File
                 }
 
             }
-
         }
+
     }
 }

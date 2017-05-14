@@ -21,8 +21,7 @@ namespace GZipLib.GZip
         private bool _writeCompressedSize = false;
         private const int _posOfCompressedSize = 16;
 
-
-
+        
         public string OriginalFileName
         {
             get;

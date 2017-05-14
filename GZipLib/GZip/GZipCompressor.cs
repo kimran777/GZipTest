@@ -1,5 +1,4 @@
-﻿using GZipLib.File;
-using GZipLib.GZip.Exceptions;
+﻿using GZipLib.GZip.Exceptions;
 using GZipLib.Threading;
 using System;
 using System.IO;
@@ -8,7 +7,7 @@ using System.Threading;
 
 namespace GZipLib.GZip
 {
-    class GZipCompressor : Compressor
+    public class GZipCompressor : Compressor
     {
         long _numOfBlocks = 0;
         Stream _inFileStream;
@@ -103,10 +102,10 @@ namespace GZipLib.GZip
         {
             if (OutFileInfo.Extension.ToLower() != ".gz")
             {
-                OutFileInfo = new FileInfo(OutFileInfo.FullName + ".gz");
+                throw new FileExtensionException("Результирующий файл должен быть формата .gz");
             }
 
-            _outFileStream = FileHelper.CreateFileToWrite(OutFileInfo);
+            _outFileStream = OutFileInfo.Open(FileMode.Create, FileAccess.Write);
 
         }
 
