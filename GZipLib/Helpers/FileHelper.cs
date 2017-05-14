@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace GZipTest.File
+namespace GZipLib.File
 {
     class FileHelper
     {

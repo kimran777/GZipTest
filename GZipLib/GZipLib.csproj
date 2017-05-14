@@ -41,9 +41,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GZipStreamEx.cs" />
-    <Compile Include="HeaderFLG.cs" />
+    <Compile Include="GZip\GZipStreamEx.cs" />
+    <Compile Include="GZip\Comressor.cs" />
+    <Compile Include="GZip\DataBlock.cs" />
+    <Compile Include="GZip\Exceptions\FileExtensionException.cs" />
+    <Compile Include="GZip\GZipCompressor.cs" />
+    <Compile Include="GZip\GZipDecompressor.cs" />
+    <Compile Include="GZip\HeaderFLG.cs" />
+    <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Threading\DictionaryWithLock.cs" />
+    <Compile Include="Threading\ThreadManager.cs" />
+    <Compile Include="Threading\ThreadsExtension.cs" />
+    <Compile Include="Threading\WaitThreadResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

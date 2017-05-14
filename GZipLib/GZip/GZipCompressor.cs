@@ -1,12 +1,12 @@
-﻿using GZipTest.File;
-using GZipTest.GZip.Exceptions;
-using GZipTest.Threading;
+﻿using GZipLib.File;
+using GZipLib.GZip.Exceptions;
+using GZipLib.Threading;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading;
 
-namespace GZipTest.GZip
+namespace GZipLib.GZip
 {
     class GZipCompressor : Compressor
     {
@@ -67,7 +67,7 @@ namespace GZipTest.GZip
 
                 using (var mem = new MemoryStream())
                 {
-                    using (var gzStream = new GZipLib.GZipStreamEx(mem, CompressionMode.Compress, originalFileName, true))
+                    using (var gzStream = new GZipStreamEx(mem, CompressionMode.Compress, originalFileName, true))
                     {
                         gzStream.Write(buffer, 0, readedData);
                     }

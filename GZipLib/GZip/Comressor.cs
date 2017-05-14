@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace GZipTest.GZip
+namespace GZipLib.GZip
 {
-    abstract class Compressor
+    abstract public class Compressor
     {
 
         public Compressor(FileInfo inFileInfo, FileInfo outFileInfo)

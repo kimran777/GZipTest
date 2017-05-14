@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GZipTest.GZip
+namespace GZipLib.GZip
 {
     class DataBlock
     {

@@ -1,14 +1,14 @@
 ﻿using GZipLib;
-using GZipTest.File;
-using GZipTest.GZip.Exceptions;
-using GZipTest.Threading;
+using GZipLib.File;
+using GZipLib.GZip.Exceptions;
+using GZipLib.Threading;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 
-namespace GZipTest.GZip
+namespace GZipLib.GZip
 {
     class GZipDecompressor : Compressor
     {

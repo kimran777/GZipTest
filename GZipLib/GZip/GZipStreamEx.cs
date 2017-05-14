@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
-namespace GZipLib
+namespace GZipLib.GZip
 {
     public class GZipStreamEx : GZipStream
     {
