@@ -13,6 +13,16 @@ namespace GZipTest
     {
         static void Main(string[] args)
         {
+            try
+            {
+                FileInfo inputInfo = new FileInfo(@"D:\1024000.txt_");
+                FileInfo outInfo = new FileInfo(@"D:\1024000.txt.gz");
+
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
         }
 

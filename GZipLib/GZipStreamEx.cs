@@ -22,16 +22,19 @@ namespace GZipLib
         private const int _posOfCompressedSize = 16;
 
 
+
         public string OriginalFileName
         {
             get;
             private set;
         }
+
         public CompressionMode CompressionMode
         {
             get;
             private set;
         }
+
         public Stream LocalBaseStream { get; private set; }
 
         public GZipStreamEx(Stream stream, CompressionMode mode, string originalFileName = null, bool writeCompressedSize = false)
@@ -149,8 +152,7 @@ namespace GZipLib
             Encoding utf8 = Encoding.UTF8;
             return Encoding.Convert(iso, utf8, iso.GetBytes(input)).Concat(new byte[] { 0 }).ToArray();
         }
-
-
+        
         public override void Close()
         {
             if (CompressionMode == CompressionMode.Compress)
@@ -182,7 +184,7 @@ namespace GZipLib
             }
             LocalBaseStream = null;
         }
-
+        
         public static bool TryGetBlockSize(Stream stream, out int blockSize)
         {            
             blockSize = 0;
