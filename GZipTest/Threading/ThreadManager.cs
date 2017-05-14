@@ -49,31 +49,6 @@ namespace GZipTest.Threading
             return result;
         }
 
-        public static void StartThreadsWithIndex(List<Thread> threads)
-        {
-            int index = 0;
-            foreach(var thread in threads)
-            {
-                thread.Start(index);
-                index++;
-            }
-        }
-
-        public static void StartThreads(List<Thread> threads)
-        {
-            foreach (var thread in threads)
-            {
-                thread.Start();
-            }
-        }
-
-        public static void WaitThreads(List<Thread> threads)
-        {
-            foreach (var thread in threads)
-            {
-                thread.Join();
-            }
-        }
 
     }
 }

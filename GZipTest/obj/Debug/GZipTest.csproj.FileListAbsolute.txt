@@ -5,3 +5,4 @@ C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\obj\Debug
 C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\obj\Debug\GZipTest.pdb
 C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Debug\GZipLib.dll
 C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Debug\GZipLib.pdb
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Debug\GZipTest.exe.config

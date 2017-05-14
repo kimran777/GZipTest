@@ -33,7 +33,7 @@ namespace GZipLib
             private set;
         }
         public Stream LocalBaseStream { get; private set; }
-        
+
         public GZipStreamEx(Stream stream, CompressionMode mode, string originalFileName = null, bool writeCompressedSize = false)
             : base(stream, mode, true)
         {
@@ -65,7 +65,7 @@ namespace GZipLib
             if (_isFirstWrite && count > 0)
             {
                 _isFirstWrite = false;
-                
+
                 if (_writeOriginalFileName)
                 {
                     FixFileName();
@@ -90,7 +90,7 @@ namespace GZipLib
             BaseStream.Read(buffer, 0, (int)BaseStream.Length);
 
             List<byte> fixBytes = buffer.ToList();
-            
+
             //fix flag
             fixBytes[3] = (byte)(fixBytes[3] | (byte)HeaderFLG.FEXTRA);
 
@@ -105,7 +105,7 @@ namespace GZipLib
             };
 
             fixBytes.InsertRange(10, extraFieldBytes);
-            
+
             BaseStream.Seek(0, SeekOrigin.Begin);
             BaseStream.Write(fixBytes.ToArray(), 0, fixBytes.Count);
 
@@ -142,7 +142,7 @@ namespace GZipLib
             BaseStream.Seek(0, SeekOrigin.Begin);
             BaseStream.Write(fixBytes.ToArray(), 0, fixBytes.Count);
         }
-                
+
         private byte[] StringToGZipBytes(string input)
         {
             Encoding iso = Encoding.GetEncoding("ISO-8859-1");
@@ -153,12 +153,12 @@ namespace GZipLib
 
         public override void Close()
         {
-            if(CompressionMode == CompressionMode.Compress)
+            if (CompressionMode == CompressionMode.Compress)
             {
                 if (BaseStream.Length == 0)
                 {
                     BaseStream.Write(_zeroFileData, 0, _zeroFileData.Length);
-                    
+
                     if (_writeOriginalFileName)
                     {
                         FixFileName();
@@ -168,13 +168,13 @@ namespace GZipLib
                         FixExtraCompressedSize();
                     }
 
-                }                
+                }
             }
-            
+
             base.Close();
 
 
-            if(CompressionMode == CompressionMode.Compress && _writeCompressedSize)
+            if (CompressionMode == CompressionMode.Compress && _writeCompressedSize)
             {
                 LocalBaseStream.Seek(16, SeekOrigin.Begin);
                 var sizeBytes = BitConverter.GetBytes((int)LocalBaseStream.Length);
@@ -183,6 +183,28 @@ namespace GZipLib
             LocalBaseStream = null;
         }
 
+        public static bool TryGetBlockSize(Stream stream, out int blockSize)
+        {            
+            blockSize = 0;
+
+            byte[] buffer = new byte[20];
+            int readedBytes = stream.Read(buffer, 0, 20);
+            stream.Seek(-20, SeekOrigin.Current);
+            if (readedBytes == 20)
+            {
+                if( ((HeaderFLG)buffer[3] & HeaderFLG.FEXTRA) != 0)
+                {
+                    if(buffer[12] == 0x42 && buffer[13] == 0x53)
+                    {
+                        blockSize = BitConverter.ToInt32(buffer, 16);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+
+        }
         
     }
 

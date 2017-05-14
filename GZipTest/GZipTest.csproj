@@ -11,6 +11,7 @@
     <AssemblyName>GZipTest</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -41,19 +44,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GZip\DataBlock.cs" />
+    <Compile Include="GZip\Exceptions\FileExtensionException.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="GZip\Comressor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GZip\GZipCompressor.cs" />
     <Compile Include="Threading\DictionaryWithLock.cs" />
     <Compile Include="Threading\ThreadManager.cs" />
+    <Compile Include="Threading\WaitThreadResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GZipLib\GZipLib.csproj">
       <Project>{8d9e363d-7929-4129-9b6a-f651decdfaf1}</Project>
       <Name>GZipLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

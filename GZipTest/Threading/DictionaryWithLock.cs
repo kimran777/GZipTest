@@ -8,6 +8,7 @@ namespace GZipTest.Threading
 {
     class DictionaryWithLock<T> where T : class
     {
+
         private readonly object _lockPoint = new object();
         private Dictionary<long, T> _dictionary = new Dictionary<long, T>();
         private bool _isStopped = false;
@@ -58,7 +59,7 @@ namespace GZipTest.Threading
                 {
                     Monitor.Wait(_lockPoint);
                 }
-
+                
                 if (_dictionary.Count == 0 || _isAbort)
                 {
                     return null;
@@ -78,8 +79,11 @@ namespace GZipTest.Threading
         {
             lock (_lockPoint)
             {
-                _isStopped = true;
-                Monitor.PulseAll(_lockPoint);
+                if(!_isStopped)
+                {
+                    _isStopped = true;
+                    Monitor.PulseAll(_lockPoint);
+                }
             }
         }
 

@@ -8,6 +8,7 @@ namespace GZipTest.GZip
 {
     abstract class Comressor
     {
+
         public Comressor(FileInfo inFileInfo, FileInfo outFileInfo)
         {
             if(inFileInfo == null)
@@ -41,9 +42,9 @@ namespace GZipTest.GZip
             get;
             set;
         }
-                
-        protected long _inputLength;
+        protected readonly int _blockSize = 1024 * 1024;
 
+        protected long _inputLength;
 
         abstract public void Start();
     }
