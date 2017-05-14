@@ -6,10 +6,10 @@ using System.Text;
 
 namespace GZipTest.GZip
 {
-    abstract class Comressor
+    abstract class Compressor
     {
 
-        public Comressor(FileInfo inFileInfo, FileInfo outFileInfo)
+        public Compressor(FileInfo inFileInfo, FileInfo outFileInfo)
         {
             if(inFileInfo == null)
             {

@@ -46,6 +46,7 @@
     <Compile Include="GZip\DataBlock.cs" />
     <Compile Include="GZip\Exceptions\FileExtensionException.cs" />
     <Compile Include="GZip\GZipCompressor.cs" />
+    <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="GZip\Comressor.cs" />
     <Compile Include="Program.cs" />

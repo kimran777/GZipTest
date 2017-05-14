@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace GZipTest.GZip
 {
-    class GZipCompressor : Comressor
+    class GZipCompressor : Compressor
     {
         long _numOfBlocks = 0;
         Stream _inFileStream;
