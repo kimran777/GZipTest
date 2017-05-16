@@ -13,11 +13,6 @@ namespace Threading
             ThreadState = threadState;
         }
 
-        public Thread Thread
-        {
-            get;
-            private set;
-        }
         public ThreadState ThreadState
         {
             get;

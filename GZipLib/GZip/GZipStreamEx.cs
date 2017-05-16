@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GZipLib.GZip.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -17,8 +18,6 @@ namespace GZipLib.GZip
         };
 
         private bool _isFirstWrite = true;
-        private bool _writeOriginalFileName = false;
-        private bool _writeCompressedSize = false;
         private const int _posOfCompressedSize = 16;
 
         
@@ -36,21 +35,13 @@ namespace GZipLib.GZip
 
         public Stream LocalBaseStream { get; private set; }
 
-        public GZipStreamEx(Stream stream, CompressionMode mode, string originalFileName = null, bool writeCompressedSize = false)
+        public GZipStreamEx(Stream stream, CompressionMode mode)
             : base(stream, mode, true)
         {
-
-            OriginalFileName = originalFileName;
-            if (!string.IsNullOrEmpty(originalFileName))
-            {
-                _writeOriginalFileName = true;
-            }
-
             CompressionMode = mode;
             LocalBaseStream = stream;
-            _writeCompressedSize = writeCompressedSize;
 
-            if (mode == CompressionMode.Compress && _writeCompressedSize == true && _writeOriginalFileName == true)
+            if (CompressionMode == CompressionMode.Compress)
             {
                 if (!stream.CanRead || !stream.CanWrite)
                 {
@@ -68,26 +59,21 @@ namespace GZipLib.GZip
             {
                 _isFirstWrite = false;
 
-                if (_writeOriginalFileName)
-                {
-                    FixFileName();
-                }
-                if (_writeCompressedSize)
-                {
-                    FixExtraCompressedSize();
-                }
+                AddExtraCompressedSize();
             }
 
         }
+        
 
-        private void FixExtraCompressedSize()
+        private void AddExtraCompressedSize()
         {
             if (BaseStream.Length < 10)
             {
                 throw new InvalidDataException();
             }
-
+            
             byte[] buffer = new byte[BaseStream.Length];
+
             BaseStream.Seek(0, SeekOrigin.Begin);
             BaseStream.Read(buffer, 0, (int)BaseStream.Length);
 
@@ -112,97 +98,55 @@ namespace GZipLib.GZip
             BaseStream.Write(fixBytes.ToArray(), 0, fixBytes.Count);
 
         }
-
-        private void FixFileName()
-        {
-            if (BaseStream.Length < 10)
-            {
-                throw new InvalidDataException();
-            }
-
-            byte[] buffer = new byte[BaseStream.Length];
-            BaseStream.Seek(0, SeekOrigin.Begin);
-            BaseStream.Read(buffer, 0, (int)BaseStream.Length);
-
-            List<byte> fixBytes = buffer.ToList();
-
-            if (fixBytes[3] != 0)
-            {
-                BaseStream.Seek(0, SeekOrigin.End);
-                return;
-            }
-
-            //fix flag
-            fixBytes[3] = (byte)(HeaderFLG.FNAME);
-
-            //get name in Latin-1 encoding with 0 byte at end
-            var bytesFileName = StringToGZipBytes(OriginalFileName);
-
-            //insert after header 10 byte
-            fixBytes.InsertRange(10, bytesFileName);
-
-            BaseStream.Seek(0, SeekOrigin.Begin);
-            BaseStream.Write(fixBytes.ToArray(), 0, fixBytes.Count);
-        }
-
-        private byte[] StringToGZipBytes(string input)
-        {
-            Encoding iso = Encoding.GetEncoding("ISO-8859-1");
-            Encoding utf8 = Encoding.UTF8;
-            return Encoding.Convert(iso, utf8, iso.GetBytes(input)).Concat(new byte[] { 0 }).ToArray();
-        }
         
         public override void Close()
         {
+            //fix zero length input with compress 
             if (CompressionMode == CompressionMode.Compress)
             {
                 if (BaseStream.Length == 0)
                 {
                     BaseStream.Write(_zeroFileData, 0, _zeroFileData.Length);
-
-                    if (_writeOriginalFileName)
-                    {
-                        FixFileName();
-                    }
-                    if (_writeCompressedSize)
-                    {
-                        FixExtraCompressedSize();
-                    }
-
+                    AddExtraCompressedSize();
                 }
             }
 
             base.Close();
 
 
-            if (CompressionMode == CompressionMode.Compress && _writeCompressedSize)
+            if (CompressionMode == CompressionMode.Compress)
             {
+                //16 - position to write extra field Block Size
                 LocalBaseStream.Seek(16, SeekOrigin.Begin);
                 var sizeBytes = BitConverter.GetBytes((int)LocalBaseStream.Length);
                 LocalBaseStream.Write(sizeBytes, 0, 4);
             }
+
             LocalBaseStream = null;
         }
         
-        public static bool TryGetBlockSize(Stream stream, out int blockSize)
-        {            
-            blockSize = 0;
 
-            byte[] buffer = new byte[20];
-            int readedBytes = stream.Read(buffer, 0, 20);
-            stream.Seek(-20, SeekOrigin.Current);
-            if (readedBytes == 20)
+        public static bool TryGetBlockSize(Stream stream, out int blockSize)
+        {
+            blockSize = 0;
+            var extraFields = new List<ExtraField>();
+            try
             {
-                if( ((HeaderFLG)buffer[3] & HeaderFLG.FEXTRA) != 0)
+                extraFields = ExtraFieldParser.GetExtraFields(stream);
+            }
+            catch
+            {
+                return false;
+            };
+
+            foreach (var ef in extraFields)
+            {
+                if (ef.SubID1 == 0x42 && ef.SubID2 == 0x53)
                 {
-                    if(buffer[12] == 0x42 && buffer[13] == 0x53)
-                    {
-                        blockSize = BitConverter.ToInt32(buffer, 16);
-                        return true;
-                    }
+                    blockSize = BitConverter.ToInt32(ef.Data, 0);
+                    return true;
                 }
             }
-
             return false;
 
         }

@@ -6,11 +6,10 @@ using System.Threading;
 
 namespace Threading
 {
-    public class DictionaryWithLock<T> where T : class
+    public class QueueWithLock<T> where T : class
     {
-
         private readonly object _lockPoint = new object();
-        private Dictionary<long, T> _dictionary = new Dictionary<long, T>();
+        private Queue<T> _queue = new Queue<T>();
         private bool _isStopped = false;
         private bool _isAbort = false;
 
@@ -21,12 +20,12 @@ namespace Threading
         }
 
 
-        public DictionaryWithLock(long maxSize)
+        public QueueWithLock(long maxSize)
         {
             MaxSize = maxSize;
         }
 
-        public void Add(long key, T value)
+        public void Enqueue(T value)
         {
             if (value == null)
             {
@@ -35,54 +34,51 @@ namespace Threading
 
             lock (_lockPoint)
             {
-
                 if (_isStopped)
                 {
-                    throw new InvalidOperationException("ProduceConsume is stopped");
+                    throw new InvalidOperationException("Queue is stopped");
                 }
                 if (_isAbort)
                 {
-                    throw new InvalidOperationException("ProduceConsume is aborted");
+                    throw new InvalidOperationException("Queue is aborted");
                 }
 
-                while (_dictionary.Count >= MaxSize)
+                while (_queue.Count >= MaxSize)
                 {
                     Monitor.Wait(_lockPoint);
 
                     if (_isStopped)
                     {
-                        throw new InvalidOperationException("ProduceConsume is stopped");
+                        throw new InvalidOperationException("Queue is stopped");
                     }
                     if (_isAbort)
                     {
-                        throw new InvalidOperationException("ProduceConsume is aborted");
+                        throw new InvalidOperationException("Queue is aborted");
                     }
                 }
 
-
                 //queue.Add(task);
-                _dictionary[key] = value;
+                _queue.Enqueue(value);
                 Monitor.Pulse(_lockPoint);
             }
         }
 
-        public T GetValue(long key)
+        public T Dequeue()
         {
             lock (_lockPoint)
             {
-                while ((_dictionary.Count == 0 || !_dictionary.ContainsKey(key)) && !_isStopped && !_isAbort)
+                while (_queue.Count == 0 && !_isStopped && !_isAbort)
                 {
                     Monitor.Wait(_lockPoint);
                 }
-                
-                if (_dictionary.Count == 0 || _isAbort)
+
+                if (_queue.Count == 0 || _isAbort)
                 {
                     return null;
                 }
 
 
-                T value = _dictionary[key];
-                _dictionary.Remove(key);
+                T value = _queue.Dequeue();
 
                 Monitor.Pulse(_lockPoint);
 
@@ -90,15 +86,20 @@ namespace Threading
             }
         }
 
+
+        public long Count()
+        {
+            lock (_lockPoint)
+            {
+                return _queue.Count;
+            }
+        }
         public void Stop()
         {
             lock (_lockPoint)
             {
-                if(!_isStopped)
-                {
-                    _isStopped = true;
-                    Monitor.PulseAll(_lockPoint);
-                }
+                _isStopped = true;
+                Monitor.PulseAll(_lockPoint);
             }
         }
 
@@ -110,5 +111,7 @@ namespace Threading
                 Monitor.PulseAll(_lockPoint);
             }
         }
+
     }
+
 }

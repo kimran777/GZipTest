@@ -6,8 +6,11 @@ using System.Text;
 
 namespace GZipLib.GZip
 {
+
+    
     public abstract class Compressor
     {
+
 
         public Compressor(FileInfo inFileInfo, FileInfo outFileInfo)
         {
@@ -35,7 +38,6 @@ namespace GZipLib.GZip
             get;
             set;
         }
-        protected readonly int _blockSize = 1024 * 1024;
 
         protected long _inputLength;
 

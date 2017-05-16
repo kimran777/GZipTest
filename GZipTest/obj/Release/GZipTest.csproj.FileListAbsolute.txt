@@ -1,0 +1,10 @@
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\GZipTest.exe.config
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\GZipTest.exe
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\GZipTest.pdb
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\GZipLib.dll
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\Threading.dll
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\GZipLib.pdb
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\bin\Release\Threading.pdb
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\obj\Release\GZipTest.csprojResolveAssemblyReference.cache
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\obj\Release\GZipTest.exe
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\GZipTest\obj\Release\GZipTest.pdb

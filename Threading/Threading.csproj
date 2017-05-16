@@ -38,8 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DictionaryWithLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueueWithLock.cs" />
     <Compile Include="ThreadManager.cs" />
     <Compile Include="ThreadsExtension.cs" />
     <Compile Include="WaitThreadResult.cs" />

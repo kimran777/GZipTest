@@ -1,0 +1,5 @@
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\Threading\bin\Release\Threading.dll
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\Threading\bin\Release\Threading.pdb
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\Threading\obj\Release\Threading.dll
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\Threading\obj\Release\Threading.pdb
+C:\Users\kimra\Documents\Visual Studio 2015\Projects\GZipTest\Threading\obj\Release\Threading.csprojResolveAssemblyReference.cache

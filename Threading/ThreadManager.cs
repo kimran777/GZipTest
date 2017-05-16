@@ -30,6 +30,34 @@ namespace Threading
             return result;
         }
 
+        public static IEnumerable<Thread> GetSafeThreads(int numOfThread, ParameterizedThreadStart start, object param, Action<Exception> handler)
+        {
+            List<Thread> result = new List<Thread>();
+            for (int i = 0; i < numOfThread; i++)
+            {
+                result.Add(new Thread(() =>
+                {
+                    SafeExecute(() => start(param), handler);
+                }));
+            }
+            return result;
+        }
+
+        public static IEnumerable<Thread> GetSafeThreadsWithIndexParam(int numOfThread, ParameterizedThreadStart start, Action<Exception> handler)
+        {
+            List<Thread> result = new List<Thread>();
+            for (int i = 0; i < numOfThread; i++)
+            {
+                int j = i;
+                result.Add(new Thread(() =>
+                {
+                    SafeExecute(() => start(j), handler);
+                }));
+            }
+            return result;
+        }
+
+
         public static Thread GetSafeThread(ThreadStart start, Action<Exception> handler)
         {
             return new Thread(() =>
@@ -83,4 +111,5 @@ namespace Threading
             }
         }
     }
+
 }

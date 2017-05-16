@@ -18,7 +18,7 @@ namespace Threading
             }
         }
 
-        public static void StartThreads(this IEnumerable<Thread> threads)
+        public static void StartThreads(this IEnumerable<Thread> threads, ThreadPriority priority = ThreadPriority.Normal)
         {
             foreach (var thread in threads)
             {
@@ -26,6 +26,21 @@ namespace Threading
             }
         }
         
+        public static void StartThreadsWithPriority(this IEnumerable<Thread> threads, ThreadPriority priority)
+        {
+            foreach (var thread in threads)
+            {
+                thread.Priority = priority;
+                thread.Start();
+            }
+        }
+
+        public static void StartWithPriority(this Thread thread, ThreadPriority priority)
+        {
+
+            thread.Priority = priority;
+            thread.Start();
+        }
 
         public static IEnumerable<WaitThreadResult> WaitThreads(this IEnumerable<Thread> threads)
         {

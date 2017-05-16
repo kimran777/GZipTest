@@ -11,16 +11,22 @@ namespace GZipLib.GZip
 {
     public class GZipDecompressor : Compressor
     {
+        private readonly int _numReadThreads = 0;
         Stream _inFileStream;
         Stream _outFileStream;
         private readonly object _lockPoint = new object();
-        DictionaryWithLock<DataBlock> _decompressedBlocksProd;
+        QueueWithLock<DataBlock>[] _decompressedBlocksProd;
         Queue<Exception> _errors = new Queue<Exception>();
 
 
         public GZipDecompressor(FileInfo inFileInfo, FileInfo outFileInfo) : base(inFileInfo, outFileInfo)
         {
-            _decompressedBlocksProd = new DictionaryWithLock<DataBlock>(50);
+            _numReadThreads = GetNumReadThreads();
+            _decompressedBlocksProd = new QueueWithLock<DataBlock>[_numReadThreads];
+            for(int i = 0; i < _decompressedBlocksProd.Length; i++)
+            {
+                _decompressedBlocksProd[i] = new QueueWithLock<DataBlock>(100);
+            }
         }
 
         public override void Start()
@@ -30,15 +36,18 @@ namespace GZipLib.GZip
             PrepareOutFileStream();
 
             var writeThread = ThreadManager.GetSafeThread(WriteBlocks, ExceptionHandler);
-            writeThread.Start();
+            writeThread.StartWithPriority(ThreadPriority.BelowNormal);
 
             var decompressThreads = ThreadManager.GetSafeThreads(Environment.ProcessorCount, DecompressBlocks, ExceptionHandler);
-            decompressThreads.StartThreads();
+            decompressThreads.StartThreads(ThreadPriority.AboveNormal);
 
 
             decompressThreads.WaitThreads().ContinueWithOneTime(() =>
             {
-                _decompressedBlocksProd.Stop();
+                foreach(var prod in _decompressedBlocksProd)
+                {
+                    prod.Stop();
+                }
             });
             
 
@@ -56,6 +65,7 @@ namespace GZipLib.GZip
 
 
         int blockIter = 0;
+
         private void DecompressBlocks()
         {
 
@@ -63,6 +73,10 @@ namespace GZipLib.GZip
             int blockId = 0;
             string origFileName = InFileInfo.Name;
             byte[] buffer = null;
+            int size = 0;
+
+
+
             while (true)
             {
                 lock (_lockPoint)
@@ -87,30 +101,34 @@ namespace GZipLib.GZip
 
                     blockId = blockIter;
                     blockIter++;
+                    
                 }
 
+                size = BitConverter.ToInt32(buffer, buffer.Length - 4);
 
-
-                using (var input = new MemoryStream(buffer))
+                using (MemoryStream output = new MemoryStream())
                 {
-                    using (MemoryStream output = new MemoryStream())
+                    using (var input = new MemoryStream(buffer))
                     {
                         using (var gzStream = new GZipStreamEx(input, CompressionMode.Decompress))
                         {
-                            byte[] localBuffer = new byte[4096];
+
+                            byte[] localBuffer = new byte[size];
                             int decompCountBytes = 0;
+
                             do
                             {
-                                decompCountBytes = gzStream.Read(localBuffer, 0, 4096);
+                                decompCountBytes = gzStream.Read(localBuffer, 0, size);
                                 output.Write(localBuffer, 0, decompCountBytes);
                             }
                             while (decompCountBytes != 0);
+
+                            _decompressedBlocksProd[blockId % _numReadThreads].Enqueue(new DataBlock(output.ToArray(), (int)output.Length, blockId));
+
                         }
-                        _decompressedBlocksProd.Add(blockId, new DataBlock(output.ToArray(), (int)output.Length, blockId));
                     }
                 }
 
-                //GC.Collect();
             }
 
 
@@ -119,19 +137,22 @@ namespace GZipLib.GZip
 
         private void WriteBlocks()
         {
-            int i = 0;
+
             while (true)
             {
-                DataBlock bl = _decompressedBlocksProd.GetValue(i);
-
-                //aborted or end 
-                if (bl == null)
+                for(int i = 0; i < _decompressedBlocksProd.Length; i++)
                 {
-                    break;
+                    DataBlock bl = _decompressedBlocksProd[i].Dequeue();
+                    //aborted or end 
+                    if (bl == null)
+                    {
+                        return;
+                    }
+
+                    _outFileStream.Write(bl.Data, 0, bl.DataSize);
                 }
 
-                _outFileStream.Write(bl.Data, 0, bl.DataSize);
-                i++;
+
             }
         }
 
@@ -157,13 +178,32 @@ namespace GZipLib.GZip
             _outFileStream = OutFileInfo.Open(FileMode.Create, FileAccess.Write);
 
         }
+        private int GetNumReadThreads()
+        {
+            if (Environment.ProcessorCount > 1)
+            {
+                return Environment.ProcessorCount - 1;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
         private void ExceptionHandler(Exception exception)
         {
-            _decompressedBlocksProd.Abort();
             lock (_errors)
             {
                 _errors.Enqueue(exception);
             }
+            for (int i = 0; i < _decompressedBlocksProd.Length; i++)
+            {
+                _decompressedBlocksProd[i].Abort();
+            }
+            //lock (_errors)
+            //{
+            //    _errors.Enqueue(exception);
+            //}
             Thread.CurrentThread.Abort();
         }
     }

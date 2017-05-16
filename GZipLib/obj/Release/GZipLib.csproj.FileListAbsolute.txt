@@ -1,0 +1,7 @@
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\bin\Release\GZipLib.dll
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\bin\Release\GZipLib.pdb
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\bin\Release\Threading.dll
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\bin\Release\Threading.pdb
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\obj\Release\GZipLib.csprojResolveAssemblyReference.cache
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\obj\Release\GZipLib.dll
+C:\Users\kimra\documents\visual studio 2015\Projects\GZipTest\GZipLib\obj\Release\GZipLib.pdb
